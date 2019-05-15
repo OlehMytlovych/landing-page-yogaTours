@@ -91,4 +91,22 @@ window.addEventListener("DOMContentLoaded", function (){
   }
 
   setClock('timer', deadline); // executing this function will create the timer. Changing the parameters will create a new timer
+
+  //MODAL WINDOW
+
+  let moreButton = document.querySelector('.more'),//The "Узнать больше" button
+      overlay = document.querySelector('.overlay'),//the modal window
+      closeCross = document.querySelector('.popup-close');
+
+  moreButton.addEventListener('click', function () {
+    overlay.style.display = 'block';
+    this.classList.add('more-splash');//this means current element (similar to event.target somehow)
+    document.body.style.overflow = 'hidden';//to disable scroll on the page while the modal window is visible 
+  });
+
+  closeCross.addEventListener('click', function() {
+    overlay.style.display = 'none';
+    moreButton.classList.remove('more-splash');
+    document.body.style.overflow = '';
+  })
 });
