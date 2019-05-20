@@ -117,5 +117,60 @@ window.addEventListener("DOMContentLoaded", function (){
     document.body.style.overflow = '';
   });
 
-  console.log(descriptionBtn)
+// FORM
+
+  let message = {
+    loading: 'Загрузка...',
+    success: 'Спасибо! Скоро мы с вами свяжемся.',
+    failure: 'Что-то пошло не так.',
+  };
+  let form = document.querySelectorAll('form'),
+      input,
+      statusMessage = document.createElement('div');
+
+  statusMessage.classList.add('status');
+
+  form = Array.from(form);
+  let i;
+  for (i = 0; i < form.length; i++){
+      form[i].addEventListener('submit', sendAJAXRequest)
+    }
+
+  function sendAJAXRequest(event){
+    event.preventDefault();
+
+    form = this;
+    input = form.getElementsByTagName('input');
+    
+    form.appendChild(statusMessage);
+
+    let request = new XMLHttpRequest();
+    request.open('POST', 'server.php');
+    request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');// to send json 1)change the heading to:
+    //request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+
+    let formData = new FormData(form);
+    //to send json 2) stringify the obj:
+    //let obj = {};
+    //formData.forEach(function(value, key){
+    //  obj[key] = value;
+    //})
+    //let json = JSON.stringify(obj);
+    request.send(formData);//to send json 3) replace this string with request.send(json);
+
+    request.addEventListener('readystatechange', function(){
+     if (request.readyState < 4){
+        statusMessage.innerHTML = message.loading;
+      } else if (request.readyState === 4 && request.status == 200){
+        statusMessage.innerHTML = message.success;
+      } else {
+        statusMessage.innerHTML = message.failure;
+      }
+    });
+  
+    for (let i = 0; i < input.length; i++){
+      input[i].value = '';
+    }
+}
+
 });
