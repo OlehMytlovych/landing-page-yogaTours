@@ -124,55 +124,57 @@ window.addEventListener("DOMContentLoaded", function (){
     success: 'Спасибо! Скоро мы с вами свяжемся.',
     failure: 'Что-то пошло не так.',
   };
-  let form = document.querySelectorAll('form'),
-      input,
-      statusMessage = document.createElement('div');
-
+  let form = document.querySelectorAll('form'), //select two forms: from modal and "we will get in touch" section at the end    input,
+      input,//will be used to select the input(s) of one of the forms
+      statusMessage = document.createElement('div');//to display a message according to stage and successfulness
+  
+  form = Array.from(form);//to create an array from a nodeList(you can't put eventListeners on nodeLists)
   statusMessage.classList.add('status');
 
-  form = Array.from(form);
-  let i;
-  for (i = 0; i < form.length; i++){
-      form[i].addEventListener('submit', sendAJAXRequest);
-    }
+  function sendForms(){
+    return new Promise(function(resolve, reject){
 
-  function sendAJAXRequest(event){
-    event.preventDefault();
+      for (let i = 0; i < form.length; i++){//assigning eventListeners to each form
+        form[i].addEventListener('submit', function(){
+          event.preventDefault();
+          
+          form = this;
+          form.appendChild(statusMessage);
 
-    form = this;
-    input = form.getElementsByTagName('input');
-    
-    form.appendChild(statusMessage);
+          input = form.getElementsByTagName('input');
+  
+          let request = new XMLHttpRequest();
+          request.open('POST', 'server.php');
+          //request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+  
+          request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
 
-    let request = new XMLHttpRequest();
-    request.open('POST', 'server.php');
-    //request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    
-    request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+          let formData = new FormData(form);
+          //request.send(formData)
+          let obj = {};
+          formData.forEach(function(value, key){
+            obj[key] = value;
+          });
+          let json = JSON.stringify(obj);
+          
+          request.send(json);
 
-    let formData = new FormData(form);
-    //request.send(formData)
-    
-    let obj = {};
-    formData.forEach(function(value, key){
-      obj[key] = value;
-    });
-    let json = JSON.stringify(obj);
-    request.send(json);
-
-    request.addEventListener('readystatechange', function(){
-     if (request.readyState < 4){
-        statusMessage.innerHTML = message.loading;
-      } else if (request.readyState === 4 && request.status == 200){
-        statusMessage.innerHTML = message.success;
-      } else {
-        statusMessage.innerHTML = message.failure;
+          request.addEventListener('readystatechange', function(){
+            if (request.readyState < 4){
+              statusMessage.innerHTML = message.loading;
+            } else if (request.readyState === 4 && request.status == 200){
+                resolve();
+            } else {
+              reject();
+            }
+          });
+        });
       }
     });
-  
-    for (let i = 0; i < input.length; i++){
-      input[i].value = '';
-    }
   }
+
+  sendForms()
+                  .then(() => statusMessage.innerHTML = message.success)
+                  .catch(() => statusMessage.innerHTML = message.failure);
 
 });
