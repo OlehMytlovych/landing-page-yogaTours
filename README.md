@@ -1,6 +1,6 @@
 # landing-page-yogaTours
 
-The project has been created with the help of html5, css3, bootstrap, less and js(ES6). 
+The landing page offers its visitors yoga trips to some of the most spiritual places in India providing with photos of picturesque sights, additional information and cost calculator.
 
-Markup is finished but the page is still being modyfied and improved with js. Tabs have been implemented already
-and further changes are about to be put into effect.
+The project has been created with the help of html5, css3, bootstrap, less, js(ES6) and bundled with Webpack. 
+
